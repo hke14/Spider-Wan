@@ -17,4 +17,5 @@ class ArtscraperItem(scrapy.Item):
     title = scrapy.Field()
     art_content = scrapy.Field()
     pic =scrapy.Field()
-
+    tag = scrapy.Field()
+    categorie = scrapy.Field()

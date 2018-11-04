@@ -47,9 +47,11 @@ class MongoPipeline(object):
             bbcDict['title'] = item['title']
             bbcDict['url'] = item['url']
             bbcDict['pic']=item['pic']
+            bbcDict['tag']=item['tag']
             self.title_seen.add(item['title'])
             title = item['title']
-            self.db[self.collection_name].update_one({"title": title}, {"$set": {"art_content": item['art_content'], "date": item['date'], "date_str": item['date_str'], "title": item['title'], "url": item['url'], "pic": item['pic']}}, upsert=True)
+            bbcDict['categorie'] = item['categorie']
+            self.db[self.collection_name].update_one({"title": title}, {"$set": {"art_content": item['art_content'], "date": item['date'], "date_str": item['date_str'], "title": item['title'], "url": item['url'], "pic": item['pic'],"tag": item['tag'],"categorie":item['categorie']}}, upsert=True)
             return item
 
        # self.db[self.collection_name].insert(dict(item))

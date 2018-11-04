@@ -1,28 +1,19 @@
-# This package will contain the spiders of your Scrapy project
-#
-# Please refer to the documentation for information on how to create and manage
-# your spiders.
-# This package will contain the spiders of your Scrapy project
-#
-# Please refer to the documentation for information on how to create and manage
-# your spiders.
-import re
 from datetime import datetime as dt
 import scrapy
+import re
 from scrapy.utils.log import configure_logging
 from twisted.internet import reactor
 from ArtScraper.items import ArtscraperItem
 from scrapy.crawler import CrawlerProcess, CrawlerRunner
 
-
-class PostSpider(scrapy.Spider):
+class CNNSpider(scrapy.Spider):
 
 
     article = ""
-    name = 'crawly'
+    name = 'craw'
     allowed_domains = []
 
-    start_urls = ['http://feeds.bbci.co.uk/arabic/rss.xml']
+    start_urls = ['https://arabic.cnn.com/api/v1/rss/middle-east/rss.xml']
 
 
 
@@ -42,24 +33,19 @@ class PostSpider(scrapy.Spider):
         for article in articles:
             item = ArtscraperItem()
             print ('hello')
-            item['tag']='BBC'
+            item['tag']='https://www.google.com/url?sa=i&source=images&cd=&cad=rja&uact=8&ved=2ahUKEwj035DStrveAhVEWBoKHeFGC4UQjRx6BAgBEAU&url=https%3A%2F%2Farabic.cnn.com%2F&psig=AOvVaw1mC94uTkLfynpQpO6NQK0a&ust=1541444529463748'
             item['date'] = dt.today()
             item['date_str'] = article.xpath('pubDate/text()').extract_first()
             item['url'] = article.xpath('link/text()').extract_first()
-            item['title'] = article.xpath('title/text()').extract_first()
-            article.register_namespace('media', 'http://search.yahoo.com/mrss/')
-            catergories = article.xpath('guid/text()').extract_first()
-
-            result = re.search('http://www.bbc.co.uk/arabic/(.*)-', catergories)
-
-
+            category1=article.xpath('link/text()').extract_first()
+            result = re.search('http://arabic.cnn.com/(.*)/article', category1)
             try :
                result1=result.group(1)
             except:
                 result1=None
             item['categorie'] = result1
-            pic = article.xpath('media:thumbnail/@url').extract_first()
-            item['pic'] = pic
+            item['title'] = article.xpath('title/text()').extract_first()
+            article.register_namespace('media', 'http://search.yahoo.com/mrss/')
             #i += 1
             url = item['url']
             #xpath("//w:gridCol", namespaces={
@@ -77,12 +63,10 @@ class PostSpider(scrapy.Spider):
 
     def parse_article(self, response):
         item = response.meta['item']
-        pars = response.xpath("//div[@class='story-body']/div[@class='story-body__inner']/p/text()").extract()
+        pars = response.xpath("//div[@class='clearfix wysiwyg _2A-9LYJ7eK']/p/text()").extract()
         if not pars:
-            pars = response.xpath("//div[@class='story-body']/p/text()").extract()
+            pars ="Found no content"
         item['art_content'] = '-'.join(pars)
+        item['pic'] = response.xpath("//picture[@class='picture']/img[@class='default-image flipboard-image']/@src").extract()
         print ("HHHH")
         yield item
-
-
-
