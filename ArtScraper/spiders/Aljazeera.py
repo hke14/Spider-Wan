@@ -65,7 +65,7 @@ class PostSpider(scrapy.Spider):
         lexicon = dict()
         pars = response.xpath("//div[@id='DynamicContentContainer']//span//text()").extract()
         pars1 = '-'.join(pars)
-        with open('/Users/georgesrbeiz/Downloads/News-3-4/ArtScraper/ArtScraper/spiders/ALL_lex.csv', 'r') as csvfile:
+        with open('ALL_lex.csv', 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
                 lexicon[row[0]] = int(row[1])
