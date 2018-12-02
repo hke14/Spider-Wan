@@ -71,17 +71,7 @@ class CNNSpider(scrapy.Spider):
         else:
             p = response.xpath("//img[@class='default-image flipboard-image']/@src").extract_first()
         item['pic'] = p
-        # contained = [x for x in temp if x in article]
-        #
-        # contained = list(set(contained))
-        #
-        # with open("match", "a") as f:
-        #     for s in contained:
-        #         f.write(str(s) + "\n")
-        #
-        # keywords = ','.join(contained)
-        #
-        # print(keywords)
+
 
         keywords=response.xpath("//footer[@class='clearfix _1MbEDqOhpQ']/ul/*/a/text()").extract()
         keyword=','.join(keywords)
@@ -89,7 +79,7 @@ class CNNSpider(scrapy.Spider):
         lexicon = dict()
 
         pars1 = '-'.join(pars)
-        with open('/home/plank223/PycharmProjects/Latest_News (1)/News-3-4/ArtScraper/ArtScraper/spiders/ALL_lex.csv', 'r') as csvfile:
+        with open('ALL_lex.csv', 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
                 lexicon[row[0]] = int(row[1])

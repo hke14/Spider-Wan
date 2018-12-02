@@ -51,7 +51,7 @@ def getScore(X):
     lexicon = dict()
 
     # Read in the lexicon.
-    with open('/Users/georgesrbeiz/Downloads/Latest_News (1)/News-3-4/ArtScraper/ArtScraper/spiders/ALL_lex.csv', 'r') as csvfile:
+    with open('ALL_lex.csv', 'r') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
             lexicon[row[0]] = int(row[1])
