@@ -20,10 +20,10 @@ class PostSpider(scrapy.Spider):
 
 
     article = ""
-    name = 'crawly'
+    name = 'bbcs'
     allowed_domains = []
 
-    start_urls = ['http://feeds.bbci.co.uk/arabic/rss.xml']
+    start_urls = ['http://www.bbc.com/arabic/business/index.xml']
 
 
 
@@ -68,7 +68,7 @@ class PostSpider(scrapy.Spider):
             if result1 in 'science-and-tech':
                 result1='tech'
 
-            item['categorie'] = result1
+            item['categorie'] = "sport"
             pic = article.xpath('media:thumbnail/@url').extract_first()
             item['pic'] = pic
             #i += 1
@@ -130,7 +130,7 @@ class PostSpider(scrapy.Spider):
 
         keyword = ','.join(keywords)
 
-        item['keywords'] = keyword
+        item['keywords'] = keywords
 
         print ("HHHH")
         yield item

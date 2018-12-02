@@ -10,10 +10,10 @@ class CNNSpider(scrapy.Spider):
 
 
     article = ""
-    name = 'craw'
+    name = 'y'
     allowed_domains = []
 
-    start_urls = ['https://arabic.cnn.com/api/v1/rss/middle-east/rss.xml']
+    start_urls = ['http://www.almanar.com.lb/rss']
 
 
 
@@ -26,8 +26,8 @@ class CNNSpider(scrapy.Spider):
         for article in articles:
             item = ArtscraperItem()
             print ('hello')
-            item['tag']='CNN'
-            item['tagu']='http://cdn.marketplaceimages.windowsphone.com/v8/images/86d045cb-6436-47a0-a0de-1726e1fc0a80?imageType=ws_icon_medium'
+            item['tag']='AlManar'
+            item['tagu']='https://botw-pd.s3.amazonaws.com/styles/logo-thumbnail/s3/0018/9882/brand.gif?itok=S-xSS_yO'
             item['date'] = dt.today()
             item['date_str'] = article.xpath('pubDate/text()').extract_first()
             item['url'] = article.xpath('link/text()').extract_first()
@@ -40,12 +40,9 @@ class CNNSpider(scrapy.Spider):
             item['categorie'] = result1
 
             item['title'] = article.xpath('title/text()').extract_first()
-
-
+            article.register_namespace('media', 'http://search.yahoo.com/mrss/')
 
             url = item['url']
-
-
 
 
             yield scrapy.Request(
@@ -57,39 +54,28 @@ class CNNSpider(scrapy.Spider):
 
     def parse_article(self, response):
         item = response.meta['item']
-        pars = response.xpath("//div[@class='clearfix wysiwyg _2A-9LYJ7eK']/p/text()").extract()
+        pars = response.xpath("//div[@class='article-content']/p/text()").extract()
         if not pars:
             pars ="Found no content"
 
-        article = ' '.join(pars)
-
-        p = response.xpath("//img[@class='default-image flipboard-image']/@src").extract()
+        p = response.xpath("//img[@class='img-responsive']/@src").extract_first()
         if not p:
 
-            p = "https://www.peacenaturals.com/wp-content/uploads/2014/08/cnn-logo.jpg"
+            p = "https://botw-pd.s3.amazonaws.com/styles/logo-thumbnail/s3/0018/9882/brand.gif?itok=S-xSS_yO"
 
         else:
-            p = response.xpath("//img[@class='default-image flipboard-image']/@src").extract_first()
-        item['pic'] = p
-        # contained = [x for x in temp if x in article]
-        #
-        # contained = list(set(contained))
-        #
-        # with open("match", "a") as f:
-        #     for s in contained:
-        #         f.write(str(s) + "\n")
-        #
-        # keywords = ','.join(contained)
-        #
-        # print(keywords)
+            p = response.xpath("//img[@class='img-responsive']/@src").extract_first()
 
-        keywords=response.xpath("//footer[@class='clearfix _1MbEDqOhpQ']/ul/*/a/text()").extract()
+        item['pic'] = p
+
+
+        keywords=response.xpath("//div[@class='article-tags']/a/text()").extract()
         keyword=','.join(keywords)
         item['keywords'] = keywords
         lexicon = dict()
 
         pars1 = '-'.join(pars)
-        with open('/home/plank223/PycharmProjects/Latest_News (1)/News-3-4/ArtScraper/ArtScraper/spiders/ALL_lex.csv', 'r') as csvfile:
+        with open('/Users/georgesrbeiz/Downloads/News-3-4/ArtScraper/ArtScraper/spiders/ALL_lex.csv', 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
                 lexicon[row[0]] = int(row[1])
@@ -101,6 +87,9 @@ class CNNSpider(scrapy.Spider):
                 score = score + lexicon[word]
             #
         item['score'] = score
+
+
+
 
 
 

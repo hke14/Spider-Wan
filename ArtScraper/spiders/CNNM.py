@@ -10,10 +10,14 @@ class CNNSpider(scrapy.Spider):
 
 
     article = ""
-    name = 'craw'
+    name = 'middle'
     allowed_domains = []
 
-    start_urls = ['https://arabic.cnn.com/api/v1/rss/middle-east/rss.xml']
+    start_urls = [
+        "https://arabic.cnn.com/api/v1/rss/middle-east/rss.xml/"
+
+
+    ]
 
 
 
@@ -37,17 +41,22 @@ class CNNSpider(scrapy.Spider):
                result1=result.group(1)
             except:
                 result1=None
-            item['categorie'] = result1
+            item['categorie'] = "middle-east"
 
             item['title'] = article.xpath('title/text()').extract_first()
-
-
-
+            article.register_namespace('media', 'http://search.yahoo.com/mrss/')
+            p= article.xpath('media:content/@url').extract_first()
+            print (p)
             url = item['url']
 
+            if not p:
 
+             p="https://www.peacenaturals.com/wp-content/uploads/2014/08/cnn-logo.jpg"
 
+            else :
+                p = article.xpath('media:content/@url').extract_first()
 
+            item['pic'] =p
             yield scrapy.Request(
                 url,
                 callback=self.parse_article,
@@ -61,16 +70,12 @@ class CNNSpider(scrapy.Spider):
         if not pars:
             pars ="Found no content"
 
-        article = ' '.join(pars)
+      #  article = ' '.join(pars)
 
-        p = response.xpath("//img[@class='default-image flipboard-image']/@src").extract()
-        if not p:
+        temp = open("/Users/georgesrbeiz/Downloads/News-3-4/ArtScraper/ArtScraper/keywords", 'r').read().splitlines()
 
-            p = "https://www.peacenaturals.com/wp-content/uploads/2014/08/cnn-logo.jpg"
+        print(temp)
 
-        else:
-            p = response.xpath("//img[@class='default-image flipboard-image']/@src").extract_first()
-        item['pic'] = p
         # contained = [x for x in temp if x in article]
         #
         # contained = list(set(contained))
@@ -89,7 +94,7 @@ class CNNSpider(scrapy.Spider):
         lexicon = dict()
 
         pars1 = '-'.join(pars)
-        with open('/home/plank223/PycharmProjects/Latest_News (1)/News-3-4/ArtScraper/ArtScraper/spiders/ALL_lex.csv', 'r') as csvfile:
+        with open('/Users/georgesrbeiz/Downloads/News-3-4/ArtScraper/ArtScraper/spiders/ALL_lex.csv', 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
                 lexicon[row[0]] = int(row[1])
@@ -101,6 +106,9 @@ class CNNSpider(scrapy.Spider):
                 score = score + lexicon[word]
             #
         item['score'] = score
+
+        temp = open("/Users/georgesrbeiz/Downloads/News-3-4/ArtScraper/ArtScraper/keywords", 'r').read().splitlines()
+
 
 
 
