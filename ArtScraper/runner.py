@@ -5,7 +5,6 @@ while True:
 
 
 
-
     # os.system("scrapy crawl craww")
     # os.system("scrapy crawl crawly")
     os.system("scrapy crawl craw")

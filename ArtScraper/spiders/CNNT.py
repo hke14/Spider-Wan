@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 import scrapy
 import re
+import pymongo
 from scrapy.utils.log import configure_logging
 from twisted.internet import reactor
 from ArtScraper.items import ArtscraperItem
@@ -78,7 +79,7 @@ class CNNSpider(scrapy.Spider):
         lexicon = dict()
 
         pars1 = '-'.join(pars)
-        with open('ArtScraper/spiders/ALL_lex.csv', 'r') as csvfile:
+        with open('spiders/ALL_lex.csv', 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
                 lexicon[row[0]] = int(row[1])
@@ -99,3 +100,39 @@ class CNNSpider(scrapy.Spider):
 
         print ("HHHH")
         yield item
+
+
+class MongoPipeline(object):
+    MONGO_URI = 'mongodb://gnr011:Kalash1@ds040309.mlab.com:40309/newsaggregartor'
+    MONGO_DATABASE = 'newsaggregartor'
+
+    collection_name = 'articles'
+
+    def __init__(self, mongo_uri, mongo_db):
+        self.mongo_uri = mongo_uri
+        self.mongo_db = mongo_db
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongo_uri=crawler.settings.get('MONGO_URI'),
+            mongo_db=crawler.settings.get('MONGO_DATABASE', 'items')
+        )
+
+    def open_spider(self, spider):
+        self.client = pymongo.MongoClient(self.mongo_uri)
+        self.db = self.client[self.mongo_db]
+
+    def close_spider(self, spider):
+        self.client.close()
+
+    def process_item(self, item, spider):
+
+
+        self.db[self.collection_name].update_one({"title": title}, {
+            "$set": {"art_content": item['art_content'], "date": item['date'], "date_str": item['date_str'],
+                     "title": item['title'], "url": item['url'], "pic": item['pic'], "tag": item['tag'],
+                     "categorie": item['categorie'], "tagu": item['tagu'], "keywords": item['keywords'],
+                     "score": item['score']}},
+                      upsert=True)
+        return item
